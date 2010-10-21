@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2010 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com/
+ * Copyright (C) 2010 Michael Richter (alias neldar)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -2120,6 +2121,13 @@ static void smdkc110_power_off(void)
 	while (1) ;
 }
 
+/* <begin> added by mr */
+// not the best solution, but a working one.
+#ifdef CONFIG_KEYPAD_CYPRESS_TOUCH_USE_BLN
+extern bool BacklightNotification_enabled;
+#endif
+/* <end> added by mr */
+
 void s3c_config_sleep_gpio_table(int array_size, unsigned int (*gpio_table)[3])
 {
 	u32 i, gpio;
@@ -2130,6 +2138,16 @@ void s3c_config_sleep_gpio_table(int array_size, unsigned int (*gpio_table)[3])
 		s3c_gpio_slp_cfgpin(gpio, gpio_table[i][1]);
 		s3c_gpio_slp_setpull_updown(gpio, gpio_table[i][2]);
 	}
+
+/* <begin> added by mr */
+#ifdef CONFIG_KEYPAD_CYPRESS_TOUCH_USE_BLN
+	if(BacklightNotification_enabled)
+	{
+	    s3c_gpio_slp_cfgpin(_3_GPIO_TOUCH_EN, S3C_GPIO_SLP_OUT1);
+	    s3c_gpio_slp_setpull_updown(_3_GPIO_TOUCH_EN, S3C_GPIO_PULL_DOWN);
+	}
+#endif
+/* <end> added by mr */
 
 	if (gpio_get_value(GPIO_PS_ON))
 	{
